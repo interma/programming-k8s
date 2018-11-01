@@ -1,4 +1,11 @@
 
+required = [
+	"github.com/sirupsen/logrus",
+	"k8s.io/client-go/plugin/pkg/client/auth/gcp", # for development against gcp
+	"k8s.io/code-generator/cmd/client-gen", # for go generate
+	"k8s.io/code-generator/cmd/deepcopy-gen", # for go generate
+]
+
 [[constraint]]
   name = "k8s.io/apimachinery"
   branch = "release-1.11"
@@ -6,10 +13,6 @@
 [[constraint]]
   name = "k8s.io/client-go"
   version = "8.0.0"
-
-[[constraint]]
-  name = "github.com/sirupsen/logrus"
-  version = "1.0.0"
 
 [prune]
   go-tests = true
