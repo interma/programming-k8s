@@ -1,0 +1,7 @@
+apiVersion: stats.example.org/v1alpha1
+kind: PodStats
+metadata:
+  name: podstats-sample
+spec:
+  # Add fields here
+  foo: bar
