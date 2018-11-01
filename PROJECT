@@ -1,0 +1,3 @@
+version: "1"
+domain: example.org
+repo: github.com/interma/programming-k8s
