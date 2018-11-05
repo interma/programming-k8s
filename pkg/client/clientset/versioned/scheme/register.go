@@ -18,7 +18,7 @@ limitations under the License.
 package scheme
 
 import (
-	statv1alpha1 "github.com/interma/programming-k8s/pkg/apis/stats/v1alpha1"
+	statsv1alpha1 "github.com/interma/programming-k8s/pkg/apis/stats/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
@@ -49,5 +49,5 @@ func init() {
 // After this, RawExtensions in Kubernetes types will serialize kube-aggregator types
 // correctly.
 func AddToScheme(scheme *runtime.Scheme) {
-	statv1alpha1.AddToScheme(scheme)
+	statsv1alpha1.AddToScheme(scheme)
 }

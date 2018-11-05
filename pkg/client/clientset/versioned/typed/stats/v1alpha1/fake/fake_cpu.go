@@ -29,13 +29,13 @@ import (
 
 // FakeCpus implements CpuInterface
 type FakeCpus struct {
-	Fake *FakeStatV1alpha1
+	Fake *FakeStatsV1alpha1
 	ns   string
 }
 
-var cpusResource = schema.GroupVersionResource{Group: "stat.example.org", Version: "v1alpha1", Resource: "cpus"}
+var cpusResource = schema.GroupVersionResource{Group: "stats.example.org", Version: "v1alpha1", Resource: "cpus"}
 
-var cpusKind = schema.GroupVersionKind{Group: "stat.example.org", Version: "v1alpha1", Kind: "Cpu"}
+var cpusKind = schema.GroupVersionKind{Group: "stats.example.org", Version: "v1alpha1", Kind: "Cpu"}
 
 // Get takes name of the cpu, and returns the corresponding cpu object, and an error if there is any.
 func (c *FakeCpus) Get(name string, options v1.GetOptions) (result *v1alpha1.Cpu, err error) {

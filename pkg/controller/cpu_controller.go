@@ -22,15 +22,17 @@ const maxRetries = 5
 const namespace = "default"
 
 // Controller object
-type PodsStatsController struct {
+type StatsController struct {
 	KubeClient kubernetes.Interface
 	CrClient   clientset.Interface
+	CpuCrName	string
 
 	queue    workqueue.RateLimitingInterface
 	informer cache.SharedIndexInformer
 }
 
-func CreatePodsStatsController(kc kubernetes.Interface, cc clientset.Interface) *PodsStatsController {
+func CreatePodsStatsController(kc kubernetes.Interface, cc clientset.Interface, crName string) *StatsController {
+	// pod event informer
 	informer := cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
@@ -45,16 +47,17 @@ func CreatePodsStatsController(kc kubernetes.Interface, cc clientset.Interface) 
 		cache.Indexers{},
 	)
 
-	c := newPodsStatsController(kc, cc, informer)
+	c := newPodsStatsController(kc, cc, informer, crName)
 
 	return c
 }
 
 func newPodsStatsController(kc kubernetes.Interface, cc clientset.Interface,
-	informer cache.SharedIndexInformer) *PodsStatsController {
+	informer cache.SharedIndexInformer, crName string) *StatsController {
 
 	queue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
 
+	// add handler to informer
 	informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(obj)
@@ -79,15 +82,15 @@ func newPodsStatsController(kc kubernetes.Interface, cc clientset.Interface,
 		},
 	})
 
-	return &PodsStatsController{kc, cc, queue, informer}
+	return &StatsController{kc, cc, crName, queue, informer}
 }
 
-func (c *PodsStatsController) HasSynced() bool {
+func (c *StatsController) HasSynced() bool {
 	return c.informer.HasSynced()
 }
 
 // Run starts the kubewatch controller
-func (c *PodsStatsController) Run(stopCh <-chan struct{}) {
+func (c *StatsController) Run(stopCh <-chan struct{}) {
 	defer utilruntime.HandleCrash()
 	defer c.queue.ShutDown()
 
@@ -101,17 +104,17 @@ func (c *PodsStatsController) Run(stopCh <-chan struct{}) {
 
 	log.Printf("controller synced and ready")
 
-	//only one worker
+	// only one worker
 	wait.Until(c.runWorker, time.Second, stopCh)
 }
 
-func (c *PodsStatsController) runWorker() {
+func (c *StatsController) runWorker() {
 	for c.processNextItem() {
 		// continue looping
 	}
 }
 
-func (c *PodsStatsController) processNextItem() bool {
+func (c *StatsController) processNextItem() bool {
 	key, quit := c.queue.Get()
 
 	if quit {
@@ -136,37 +139,42 @@ func (c *PodsStatsController) processNextItem() bool {
 	return true
 }
 
-func (c *PodsStatsController) processItem(key string) error {
+func (c *StatsController) processItem(key string) error {
 	_, name, err := cache.SplitMetaNamespaceKey(key)
 	obj, exists, err := c.informer.GetIndexer().GetByKey(key)
 	if err != nil {
 		return fmt.Errorf("Error fetching object with key %s from store: %v", key, err)
 	}
-	log.Printf("processItem: %v\n", obj)
+	//log.Printf("processItem: %v\n", obj)
 
-	statsObj, err := c.CrClient.StatV1alpha1().Cpus(namespace).Get("cpu-sample", meta_v1.GetOptions{})
-	log.Printf("get stats obj: %v %v", statsObj, err)
+	statsObj, err := c.CrClient.StatsV1alpha1().Cpus(namespace).Get(c.CpuCrName, meta_v1.GetOptions{})
+	if err != nil {
+		return fmt.Errorf("get custom resource[%s] failed: %v", c.CpuCrName, err)
+	}
+
 	statsObj = statsObj.DeepCopy()
 	if statsObj.Status.Requests == nil {
 		statsObj.Status.Requests = make(map[string]string)
 	}
 
 	if exists {
-		// add to status
+		// add or update event
 		pod, _ := obj.(*api_v1.Pod)
 
-		requestCpu := pod.Spec.Containers[0].Resources.Requests.Cpu() //assuming only one container here
-		log.Printf("processItem: %s request cpu: %v\n", name, requestCpu)
+		requestCpu := pod.Spec.Containers[0].Resources.Requests.Cpu() //TODO assuming only one container here
+		log.Printf("add/update: %s, request cpu: %v\n", name, requestCpu)
 
 		statsObj.Status.Requests[pod.Name] = requestCpu.String()
-		log.Printf("add to map: %v", statsObj)
-		c.CrClient.StatV1alpha1().Cpus(namespace).Update(statsObj)
-
+		_, err = c.CrClient.StatsV1alpha1().Cpus(namespace).Update(statsObj) //TODO loop get-update here
 	} else {
-		// delete from status
+		// delete event
+		log.Printf("delete: %s", name)
+
 		delete(statsObj.Status.Requests, name)
-		log.Printf("delete from map: %v", name)
-		c.CrClient.StatV1alpha1().Cpus(namespace).Update(statsObj)
+		_, err = c.CrClient.StatsV1alpha1().Cpus(namespace).Update(statsObj) //TODO loop get-update here
+	}
+	if err != nil {
+		return err
 	}
 
 	return nil

@@ -60,13 +60,13 @@ func NewFilteredCpuInformer(client versioned.Interface, namespace string, resync
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.StatV1alpha1().Cpus(namespace).List(options)
+				return client.StatsV1alpha1().Cpus(namespace).List(options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.StatV1alpha1().Cpus(namespace).Watch(options)
+				return client.StatsV1alpha1().Cpus(namespace).Watch(options)
 			},
 		},
 		&stats_v1alpha1.Cpu{},

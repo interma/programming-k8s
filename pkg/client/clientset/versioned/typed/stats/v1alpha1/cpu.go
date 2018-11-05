@@ -53,7 +53,7 @@ type cpus struct {
 }
 
 // newCpus returns a Cpus
-func newCpus(c *StatV1alpha1Client, namespace string) *cpus {
+func newCpus(c *StatsV1alpha1Client, namespace string) *cpus {
 	return &cpus{
 		client: c.RESTClient(),
 		ns:     namespace,

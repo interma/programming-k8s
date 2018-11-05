@@ -11,14 +11,13 @@ import (
 	clientset "github.com/interma/programming-k8s/pkg/client/clientset/versioned"
 	"github.com/interma/programming-k8s/pkg/controller"
 	"k8s.io/client-go/kubernetes"
-	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
+	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp" // for google cloud auth
 	"k8s.io/client-go/tools/clientcmd"
 )
 
 var (
-	kubeconfig string
-	KubeClient kubernetes.Interface // global kubeClient
-	CrClient   clientset.Interface  // global crClient
+	kubeconfig string // kube config path
+	cpuCR	string // cpu custom resource
 )
 
 //usage:
@@ -26,15 +25,14 @@ var (
 func main() {
 	flag.Parse()
 	masterURL := ""
+
 	stopCh := make(chan struct{})
 	defer close(stopCh)
 
-	// init kubeclient by kubeconfig
 	cfg, err := clientcmd.BuildConfigFromFlags(masterURL, kubeconfig)
 	if err != nil {
 		log.Fatalf("Error building kubeconfig: %s", err.Error())
 	}
-
 	KubeClient, err := kubernetes.NewForConfig(cfg)
 	if err != nil {
 		log.Fatalf("Error building kubernetes clientset: %s", err.Error())
@@ -44,7 +42,7 @@ func main() {
 		log.Fatalf("Error building customresource clientset: %s", err.Error())
 	}
 
-	c := controller.CreatePodsStatsController(KubeClient, CrClient)
+	c := controller.CreatePodsStatsController(KubeClient, CrClient, cpuCR)
 	go c.Run(stopCh)
 
 	sigterm := make(chan os.Signal, 1)
@@ -57,4 +55,5 @@ func main() {
 
 func init() {
 	flag.StringVar(&kubeconfig, "kubeconfig", "", "Path to a kubeconfig. Only required if out-of-cluster.")
+	flag.StringVar(&cpuCR, "cpuCR", "cpu-sample", "the name of cpu custom resource.")
 }

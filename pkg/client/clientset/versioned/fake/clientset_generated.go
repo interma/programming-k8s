@@ -19,8 +19,8 @@ package fake
 
 import (
 	clientset "github.com/interma/programming-k8s/pkg/client/clientset/versioned"
-	statv1alpha1 "github.com/interma/programming-k8s/pkg/client/clientset/versioned/typed/stats/v1alpha1"
-	fakestatv1alpha1 "github.com/interma/programming-k8s/pkg/client/clientset/versioned/typed/stats/v1alpha1/fake"
+	statsv1alpha1 "github.com/interma/programming-k8s/pkg/client/clientset/versioned/typed/stats/v1alpha1"
+	fakestatsv1alpha1 "github.com/interma/programming-k8s/pkg/client/clientset/versioned/typed/stats/v1alpha1/fake"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/discovery"
@@ -69,12 +69,12 @@ func (c *Clientset) Discovery() discovery.DiscoveryInterface {
 
 var _ clientset.Interface = &Clientset{}
 
-// StatV1alpha1 retrieves the StatV1alpha1Client
-func (c *Clientset) StatV1alpha1() statv1alpha1.StatV1alpha1Interface {
-	return &fakestatv1alpha1.FakeStatV1alpha1{Fake: &c.Fake}
+// StatsV1alpha1 retrieves the StatsV1alpha1Client
+func (c *Clientset) StatsV1alpha1() statsv1alpha1.StatsV1alpha1Interface {
+	return &fakestatsv1alpha1.FakeStatsV1alpha1{Fake: &c.Fake}
 }
 
-// Stat retrieves the StatV1alpha1Client
-func (c *Clientset) Stat() statv1alpha1.StatV1alpha1Interface {
-	return &fakestatv1alpha1.FakeStatV1alpha1{Fake: &c.Fake}
+// Stats retrieves the StatsV1alpha1Client
+func (c *Clientset) Stats() statsv1alpha1.StatsV1alpha1Interface {
+	return &fakestatsv1alpha1.FakeStatsV1alpha1{Fake: &c.Fake}
 }

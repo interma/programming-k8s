@@ -36,7 +36,6 @@ type CpuStatus struct {
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// Cpu is the Schema for the podstats API
 // +k8s:openapi-gen=true
 type Cpu struct {
 	metav1.TypeMeta   `json:",inline"`
@@ -47,8 +46,6 @@ type Cpu struct {
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-
-// CpuList contains a list of Cpu
 type CpuList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
