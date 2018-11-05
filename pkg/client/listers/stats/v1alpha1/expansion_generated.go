@@ -17,10 +17,10 @@ limitations under the License.
 
 package v1alpha1
 
-// PodStatsListerExpansion allows custom methods to be added to
-// PodStatsLister.
-type PodStatsListerExpansion interface{}
+// CpuListerExpansion allows custom methods to be added to
+// CpuLister.
+type CpuListerExpansion interface{}
 
-// PodStatsNamespaceListerExpansion allows custom methods to be added to
-// PodStatsNamespaceLister.
-type PodStatsNamespaceListerExpansion interface{}
+// CpuNamespaceListerExpansion allows custom methods to be added to
+// CpuNamespaceLister.
+type CpuNamespaceListerExpansion interface{}

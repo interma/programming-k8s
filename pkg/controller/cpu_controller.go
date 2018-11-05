@@ -92,7 +92,6 @@ func (c *PodsStatsController) Run(stopCh <-chan struct{}) {
 	defer c.queue.ShutDown()
 
 	log.Printf("controller start")
-
 	go c.informer.Run(stopCh)
 
 	if !cache.WaitForCacheSync(stopCh, c.HasSynced) {
@@ -138,17 +137,36 @@ func (c *PodsStatsController) processNextItem() bool {
 }
 
 func (c *PodsStatsController) processItem(key string) error {
+	_, name, err := cache.SplitMetaNamespaceKey(key)
 	obj, exists, err := c.informer.GetIndexer().GetByKey(key)
 	if err != nil {
 		return fmt.Errorf("Error fetching object with key %s from store: %v", key, err)
 	}
 	log.Printf("processItem: %v\n", obj)
 
+	statsObj, err := c.CrClient.StatV1alpha1().Cpus(namespace).Get("cpu-sample", meta_v1.GetOptions{})
+	log.Printf("get stats obj: %v %v", statsObj, err)
+	statsObj = statsObj.DeepCopy()
+	if statsObj.Status.Requests == nil {
+		statsObj.Status.Requests = make(map[string]string)
+	}
+
 	if exists {
+		// add to status
 		pod, _ := obj.(*api_v1.Pod)
 
 		requestCpu := pod.Spec.Containers[0].Resources.Requests.Cpu() //assuming only one container here
-		log.Printf("processItem: %s request cpu: %v\n", pod.Name, requestCpu)
+		log.Printf("processItem: %s request cpu: %v\n", name, requestCpu)
+
+		statsObj.Status.Requests[pod.Name] = requestCpu.String()
+		log.Printf("add to map: %v", statsObj)
+		c.CrClient.StatV1alpha1().Cpus(namespace).Update(statsObj)
+
+	} else {
+		// delete from status
+		delete(statsObj.Status.Requests, name)
+		log.Printf("delete from map: %v", name)
+		c.CrClient.StatV1alpha1().Cpus(namespace).Update(statsObj)
 	}
 
 	return nil

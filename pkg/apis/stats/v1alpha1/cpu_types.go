@@ -23,36 +23,36 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
-// PodStatsSpec defines the desired state of PodStats
-type PodStatsSpec struct {
+// the desired state
+type CpuSpec struct {
 
 }
 
-// PodStatsStatus defines the observed state of PodStats
-type PodStatsStatus struct {
-
+// the observed state
+type CpuStatus struct {
+	Requests map[string]string `json:"requests"`
 }
 
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// PodStats is the Schema for the podstats API
+// Cpu is the Schema for the podstats API
 // +k8s:openapi-gen=true
-type PodStats struct {
+type Cpu struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   PodStatsSpec   `json:"spec,omitempty"`
-	Status PodStatsStatus `json:"status,omitempty"`
+	Spec   CpuSpec   `json:"spec,omitempty"`
+	Status CpuStatus `json:"status,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// PodStatsList contains a list of PodStats
-type PodStatsList struct {
+// CpuList contains a list of Cpu
+type CpuList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []PodStats `json:"items"`
+	Items           []Cpu `json:"items"`
 }
 
 

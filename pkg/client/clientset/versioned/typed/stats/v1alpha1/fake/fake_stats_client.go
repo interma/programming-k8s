@@ -27,8 +27,8 @@ type FakeStatV1alpha1 struct {
 	*testing.Fake
 }
 
-func (c *FakeStatV1alpha1) PodStatses(namespace string) v1alpha1.PodStatsInterface {
-	return &FakePodStatses{c, namespace}
+func (c *FakeStatV1alpha1) Cpus(namespace string) v1alpha1.CpuInterface {
+	return &FakeCpus{c, namespace}
 }
 
 // RESTClient returns a RESTClient that is used to communicate

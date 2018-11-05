@@ -26,7 +26,7 @@ import (
 
 type StatV1alpha1Interface interface {
 	RESTClient() rest.Interface
-	PodStatsesGetter
+	CpusGetter
 }
 
 // StatV1alpha1Client is used to interact with features provided by the stat.example.org group.
@@ -34,8 +34,8 @@ type StatV1alpha1Client struct {
 	restClient rest.Interface
 }
 
-func (c *StatV1alpha1Client) PodStatses(namespace string) PodStatsInterface {
-	return newPodStatses(c, namespace)
+func (c *StatV1alpha1Client) Cpus(namespace string) CpuInterface {
+	return newCpus(c, namespace)
 }
 
 // NewForConfig creates a new StatV1alpha1Client for the given config.

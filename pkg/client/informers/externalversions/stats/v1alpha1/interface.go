@@ -23,8 +23,8 @@ import (
 
 // Interface provides access to all the informers in this group version.
 type Interface interface {
-	// PodStatses returns a PodStatsInformer.
-	PodStatses() PodStatsInformer
+	// Cpus returns a CpuInformer.
+	Cpus() CpuInformer
 }
 
 type version struct {
@@ -38,7 +38,7 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// PodStatses returns a PodStatsInformer.
-func (v *version) PodStatses() PodStatsInformer {
-	return &podStatsInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+// Cpus returns a CpuInformer.
+func (v *version) Cpus() CpuInformer {
+	return &cpuInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

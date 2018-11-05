@@ -30,59 +30,59 @@ import (
 	cache "k8s.io/client-go/tools/cache"
 )
 
-// PodStatsInformer provides access to a shared informer and lister for
-// PodStatses.
-type PodStatsInformer interface {
+// CpuInformer provides access to a shared informer and lister for
+// Cpus.
+type CpuInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.PodStatsLister
+	Lister() v1alpha1.CpuLister
 }
 
-type podStatsInformer struct {
+type cpuInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
 	tweakListOptions internalinterfaces.TweakListOptionsFunc
 	namespace        string
 }
 
-// NewPodStatsInformer constructs a new informer for PodStats type.
+// NewCpuInformer constructs a new informer for Cpu type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewPodStatsInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
-	return NewFilteredPodStatsInformer(client, namespace, resyncPeriod, indexers, nil)
+func NewCpuInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+	return NewFilteredCpuInformer(client, namespace, resyncPeriod, indexers, nil)
 }
 
-// NewFilteredPodStatsInformer constructs a new informer for PodStats type.
+// NewFilteredCpuInformer constructs a new informer for Cpu type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredPodStatsInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
+func NewFilteredCpuInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.StatV1alpha1().PodStatses(namespace).List(options)
+				return client.StatV1alpha1().Cpus(namespace).List(options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.StatV1alpha1().PodStatses(namespace).Watch(options)
+				return client.StatV1alpha1().Cpus(namespace).Watch(options)
 			},
 		},
-		&stats_v1alpha1.PodStats{},
+		&stats_v1alpha1.Cpu{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *podStatsInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredPodStatsInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *cpuInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
+	return NewFilteredCpuInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *podStatsInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&stats_v1alpha1.PodStats{}, f.defaultInformer)
+func (f *cpuInformer) Informer() cache.SharedIndexInformer {
+	return f.factory.InformerFor(&stats_v1alpha1.Cpu{}, f.defaultInformer)
 }
 
-func (f *podStatsInformer) Lister() v1alpha1.PodStatsLister {
-	return v1alpha1.NewPodStatsLister(f.Informer().GetIndexer())
+func (f *cpuInformer) Lister() v1alpha1.CpuLister {
+	return v1alpha1.NewCpuLister(f.Informer().GetIndexer())
 }

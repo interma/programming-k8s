@@ -26,6 +26,8 @@ var (
 func main() {
 	flag.Parse()
 	masterURL := ""
+	stopCh := make(chan struct{})
+	defer close(stopCh)
 
 	// init kubeclient by kubeconfig
 	cfg, err := clientcmd.BuildConfigFromFlags(masterURL, kubeconfig)
@@ -37,17 +39,12 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error building kubernetes clientset: %s", err.Error())
 	}
-
 	CrClient, err := clientset.NewForConfig(cfg)
 	if err != nil {
-		log.Fatalf("Error building hawqcluster clientset: %s", err.Error())
+		log.Fatalf("Error building customresource clientset: %s", err.Error())
 	}
 
 	c := controller.CreatePodsStatsController(KubeClient, CrClient)
-
-	stopCh := make(chan struct{})
-	defer close(stopCh)
-
 	go c.Run(stopCh)
 
 	sigterm := make(chan os.Signal, 1)
