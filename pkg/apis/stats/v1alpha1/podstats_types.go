@@ -25,14 +25,12 @@ import (
 
 // PodStatsSpec defines the desired state of PodStats
 type PodStatsSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+
 }
 
 // PodStatsStatus defines the observed state of PodStats
 type PodStatsStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+
 }
 
 // +genclient
@@ -57,6 +55,4 @@ type PodStatsList struct {
 	Items           []PodStats `json:"items"`
 }
 
-func init() {
-	SchemeBuilder.Register(&PodStats{}, &PodStatsList{})
-}
+
