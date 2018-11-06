@@ -1,7 +1,9 @@
 apiVersion: stats.example.org/v1alpha1
-kind: PodStats
+kind: Cpu
 metadata:
-  name: podstats-sample
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: cpu-sample
 spec:
   # Add fields here
   foo: bar
