@@ -17,7 +17,7 @@ import (
 
 var (
 	kubeconfig string // kube config path
-	cpuCR	string // cpu custom resource
+	cpuCR      string // cpu custom resource
 )
 
 //usage:

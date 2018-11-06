@@ -25,7 +25,7 @@ const namespace = "default"
 type StatsController struct {
 	KubeClient kubernetes.Interface
 	CrClient   clientset.Interface
-	CpuCrName	string
+	CpuCrName  string
 
 	queue    workqueue.RateLimitingInterface
 	informer cache.SharedIndexInformer
