@@ -2,6 +2,13 @@
 a kubernetes programming example (using CRD and custom controller):
 watch all pods events and store their cpu request in a custom resource.
 
+## code intro
+1. [CRD name](config/crds/stats-cpu-crd.yaml)
+1. [CRD structure](pkg/apis/stats/v1alpha1/cpu_types.go)
+1. [generated client code](pkg/client)
+1. [controller](pkg/controller/cpu_controller.go), informer, callback
+1. [CR instance](config/samples/stats-cpu-sample.yaml)
+  
 ## build and run
 ```
 # create rbac
@@ -21,7 +28,7 @@ $ make run
 
 ## demo
 ```
-# try create/delete pods, e.g.
+# try to create/delete pods, e.g.
 $ kubectl create -f config/samples/pod-nginx1.yaml
 
 # describe custom resource and check Status field
